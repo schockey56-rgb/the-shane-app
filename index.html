@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Productivity App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f5f4;
+  --color-background-tertiary:#e8e8e5;
+  --color-background-info:#e6f1fb;
+  --color-background-danger:#fcebeb;
+  --color-background-success:#eaf3de;
+  --color-background-warning:#faeeda;
+  --color-text-primary:#1a1a18;
+  --color-text-secondary:#5f5e5a;
+  --color-text-tertiary:#888780;
+  --color-text-info:#185fa5;
+  --color-text-danger:#a32d2d;
+  --color-text-success:#3b6d11;
+  --color-text-warning:#854f0b;
+  --color-border-tertiary:rgba(0,0,0,0.12);
+  --color-border-secondary:rgba(0,0,0,0.22);
+  --color-border-primary:rgba(0,0,0,0.32);
+  --color-border-info:rgba(24,95,165,0.4);
+  --color-border-danger:rgba(163,45,45,0.4);
+  --color-border-success:rgba(59,109,17,0.4);
+  --color-border-warning:rgba(133,79,11,0.4);
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --border-radius-xl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --color-background-primary:#1c1c1a;
+  --color-background-secondary:#252523;
+  --color-background-tertiary:#2c2c2a;
+  --color-background-info:#042c53;
+  --color-background-danger:#501313;
+  --color-background-success:#173404;
+  --color-background-warning:#412402;
+  --color-text-primary:#f0eeea;
+  --color-text-secondary:#b4b2a9;
+  --color-text-tertiary:#888780;
+  --color-text-info:#85b7eb;
+  --color-text-danger:#f09595;
+  --color-text-success:#97c459;
+  --color-text-warning:#ef9f27;
+  --color-border-tertiary:rgba(255,255,255,0.1);
+  --color-border-secondary:rgba(255,255,255,0.18);
+  --color-border-primary:rgba(255,255,255,0.28);
+  --color-border-info:rgba(133,183,235,0.35);
+  --color-border-danger:rgba(240,149,149,0.35);
+  --color-border-success:rgba(151,196,89,0.35);
+  --color-border-warning:rgba(239,159,39,0.35);
+}}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1rem}
+.app{display:flex;flex-direction:column;min-height:600px;width:100%;max-width:820px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.content{flex:1;overflow-y:auto;padding:1.25rem}
+.nav{display:flex;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.nav-btn{flex:1;padding:12px 8px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);transition:color 0.15s}
+.nav-btn.active{color:var(--color-text-info)}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.section-title{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:10px}
+input,textarea,select{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:14px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--color-border-primary);box-shadow:0 0 0 2px rgba(55,138,221,0.12)}
+textarea{resize:vertical;min-height:80px}
+.btn{padding:8px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);cursor:pointer;font-size:13px;font-family:var(--font-sans);transition:background 0.12s}
+.btn:hover{background:var(--color-background-tertiary)}
+.btn-primary{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.btn-primary:hover{opacity:0.85}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-danger{color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.badge{display:inline-block;padding:2px 8px;border-radius:var(--border-radius-md);font-size:11px;font-weight:500}
+.badge-high{background:var(--color-background-danger);color:var(--color-text-danger)}
+.badge-medium{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge-low{background:var(--color-background-success);color:var(--color-text-success)}
+.task-card{border-left:3px solid;border-radius:var(--border-radius-lg)}
+.task-high{border-left-color:#E24B4A}
+.task-medium{border-left-color:#BA7517}
+.task-low{border-left-color:#639922}
+.task-done .task-title{text-decoration:line-through;color:var(--color-text-tertiary)}
+.text-danger{color:var(--color-text-danger)}
+.text-warning{color:var(--color-text-warning)}
+.text-muted{color:var(--color-text-tertiary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;color:var(--color-text-secondary);font-size:13px;font-weight:500}
+.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--color-text-secondary);font-size:14px}
+.empty{text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:14px}
+.note-preview{cursor:pointer}
+.note-preview:hover .card{border-color:var(--color-border-primary)}
+.note-body-preview{font-size:13px;color:var(--color-text-secondary);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--color-text-secondary);background:none;border:none;cursor:pointer;font-size:13px;margin-bottom:1rem;padding:0}
+.back-btn:hover{color:var(--color-text-primary)}
+.habit-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.habit-row:last-child{border-bottom:none}
+.streak-badge{display:inline-flex;align-items:center;gap:4px;background:var(--color-background-warning);color:var(--color-text-warning);padding:2px 8px;border-radius:var(--border-radius-md);font-size:12px;font-weight:500}
+.checkbox{width:20px;height:20px;cursor:pointer;accent-color:#378ADD;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="content" id="content">
+    <div class="loading">Loading your data...</div>
+  </div>
+  <nav class="nav" id="nav">
+    <button class="nav-btn active" onclick="setTab('todo')" id="nav-todo">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      To-Do
+    </button>
+    <button class="nav-btn" onclick="setTab('notes')" id="nav-notes">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Notes
+    </button>
+    <button class="nav-btn" onclick="setTab('habits')" id="nav-habits">
+      <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Habits
+    </button>
+  </nav>
+</div>
+
+<script>
+/* ── Storage shim for standalone use (falls back to localStorage) ── */
+if(typeof window.storage === 'undefined'){
+  window.storage = {
+    get: async (key) => { const v = localStorage.getItem(key); return v ? {key, value:v} : null; },
+    set: async (key, value) => { localStorage.setItem(key, value); return {key, value}; },
+    delete: async (key) => { localStorage.removeItem(key); return {key, deleted:true}; },
+    list: async (prefix) => { const keys = Object.keys(localStorage).filter(k=>!prefix||k.startsWith(prefix)); return {keys}; }
+  };
+}
+
+const today = () => new Date().toISOString().slice(0,10);
+let state = { tab:'todo', tasks:[], notes:[], habits:[], loading:true, completedOpen:false, editNote:null, showAddTask:false, showAddNote:false, showAddHabit:false };
+let form = { taskTitle:'', taskDesc:'', taskPriority:'medium', taskDue:'', noteTitle:'', noteBody:'', habitName:'', editNoteTitle:'', editNoteBody:'' };
+
+async function loadData(){
+  try {
+    const t = await window.storage.get('tasks');
+    const n = await window.storage.get('notes');
+    const h = await window.storage.get('habits');
+    if(t) state.tasks = JSON.parse(t.value);
+    if(n) state.notes = JSON.parse(n.value);
+    if(h) state.habits = JSON.parse(h.value);
+  } catch(e){}
+  state.loading = false;
+  checkHabitReset();
+  render();
+}
+
+async function save(key, data){
+  try{ await window.storage.set(key, JSON.stringify(data)); }catch(e){}
+}
+
+function checkHabitReset(){
+  const td = today();
+  state.habits = state.habits.map(h => {
+    if(h.lastCheckedDate !== td){
+      const wasCheckedYesterday = h.lastCheckedDate === getPrevDay(td);
+      return {...h, doneToday: false, streak: wasCheckedYesterday ? h.streak : (h.doneToday ? h.streak : 0)};
+    }
+    return h;
+  });
+  save('habits', state.habits);
+}
+
+function getPrevDay(d){ const dt = new Date(d); dt.setDate(dt.getDate()-1); return dt.toISOString().slice(0,10); }
+
+function setTab(t){
+  state.tab=t; state.editNote=null; state.showAddTask=false; state.showAddNote=false; state.showAddHabit=false;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-'+t).classList.add('active');
+  render();
+}
+
+function formatDate(d){
+  if(!d) return '';
+  const [y,m,day] = d.split('-');
+  return new Date(y,m-1,day).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+function dateClass(d){
+  if(!d) return 'text-muted';
+  if(d < today()) return 'text-danger';
+  if(d === today()) return 'text-warning';
+  return 'text-muted';
+}
+
+function sortTasks(tasks){
+  const p = {high:0,medium:1,low:2};
+  return [...tasks].sort((a,b)=>{
+    if(p[a.priority]!==p[b.priority]) return p[a.priority]-p[b.priority];
+    if(!a.due && !b.due) return 0;
+    if(!a.due) return 1; if(!b.due) return -1;
+    return a.due.localeCompare(b.due);
+  });
+}
+
+function addTask(){
+  if(!form.taskTitle.trim()) return;
+  const task = {id:Date.now(), title:form.taskTitle.trim(), desc:form.taskDesc.trim(), priority:form.taskPriority, due:form.taskDue, done:false, createdAt:today()};
+  state.tasks.push(task);
+  save('tasks', state.tasks);
+  form.taskTitle=''; form.taskDesc=''; form.taskPriority='medium'; form.taskDue='';
+  state.showAddTask=false;
+  render();
+}
+
+function toggleTask(id){
+  state.tasks = state.tasks.map(t => t.id===id ? {...t, done:!t.done} : t);
+  save('tasks', state.tasks);
+  render();
+}
+
+function deleteTask(id){
+  state.tasks = state.tasks.filter(t=>t.id!==id);
+  save('tasks', state.tasks);
+  render();
+}
+
+function addNote(){
+  if(!form.noteTitle.trim()) return;
+  const note = {id:Date.now(), title:form.noteTitle.trim(), body:form.noteBody, createdAt:today()};
+  state.notes.unshift(note);
+  save('notes', state.notes);
+  form.noteTitle=''; form.noteBody='';
+  state.showAddNote=false;
+  render();
+}
+
+function openNote(id){ state.editNote=state.notes.find(n=>n.id===id); form.editNoteTitle=state.editNote.title; form.editNoteBody=state.editNote.body; render(); }
+
+function saveNote(){
+  state.notes = state.notes.map(n => n.id===state.editNote.id ? {...n, title:form.editNoteTitle, body:form.editNoteBody} : n);
+  save('notes', state.notes);
+  state.editNote=null;
+  render();
+}
+
+function deleteNote(id){
+  state.notes = state.notes.filter(n=>n.id!==id);
+  save('notes', state.notes);
+  state.editNote=null;
+  render();
+}
+
+function addHabit(){
+  if(!form.habitName.trim()) return;
+  const habit = {id:Date.now(), name:form.habitName.trim(), doneToday:false, streak:0, lastCheckedDate:null};
+  state.habits.push(habit);
+  save('habits', state.habits);
+  form.habitName='';
+  state.showAddHabit=false;
+  render();
+}
+
+function toggleHabit(id){
+  const td = today();
+  state.habits = state.habits.map(h => {
+    if(h.id!==id) return h;
+    const nowDone = !h.doneToday;
+    let streak = h.streak;
+    if(nowDone){ streak = (h.lastCheckedDate===getPrevDay(td)||h.lastCheckedDate===td) ? h.streak+1 : 1; }
+    else { streak = Math.max(0, h.streak-1); }
+    return {...h, doneToday:nowDone, streak, lastCheckedDate:nowDone?td:h.lastCheckedDate};
+  });
+  save('habits', state.habits);
+  render();
+}
+
+function deleteHabit(id){
+  state.habits = state.habits.filter(h=>h.id!==id);
+  save('habits', state.habits);
+  render();
+}
+
+function render(){
+  const c = document.getElementById('content');
+  if(state.loading){ c.innerHTML='<div class="loading">Loading your data...</div>'; return; }
+  if(state.tab==='todo') c.innerHTML = renderTodo();
+  else if(state.tab==='notes') c.innerHTML = renderNotes();
+  else c.innerHTML = renderHabits();
+  bindEvents();
+}
+
+function renderTodo(){
+  const active = sortTasks(state.tasks.filter(t=>!t.done));
+  const done = sortTasks(state.tasks.filter(t=>t.done));
+  const addForm = state.showAddTask ? `
+    <div class="card" style="margin-bottom:1rem">
+      <div class="form-group"><label>Task title *</label><input id="f-title" placeholder="What needs to be done?" value="${esc(form.taskTitle)}"></div>
+      <div class="form-group"><label>Description</label><textarea id="f-desc" placeholder="Optional details..." style="min-height:56px">${esc(form.taskDesc)}</textarea></div>
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="form-group" style="margin:0"><label>Priority</label>
+          <select id="f-prio">
+            <option value="high" ${form.taskPriority==='high'?'selected':''}>High</option>
+            <option value="medium" ${form.taskPriority==='medium'?'selected':''}>Medium</option>
+            <option value="low" ${form.taskPriority==='low'?'selected':''}>Low</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0"><label>Due date</label><input type="date" id="f-due" value="${form.taskDue}"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addTask()">Add task</button>
+        <button class="btn" onclick="state.showAddTask=false;render()">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const taskCards = active.map(t => `
+    <div class="card task-card task-${t.priority}" style="border-left-width:3px;border-radius:var(--border-radius-lg)">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" class="checkbox" style="margin-top:2px" onchange="toggleTask(${t.id})">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="task-title" style="font-size:14px;font-weight:500">${esc(t.title)}</span>
+            <span class="badge badge-${t.priority}">${t.priority}</span>
+            ${t.due ? `<span class="${dateClass(t.due)}" style="font-size:12px">${t.due < today() ? '⚠ ' : ''}${formatDate(t.due)}</span>` : ''}
+          </div>
+          ${t.desc ? `<p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">${esc(t.desc)}</p>` : ''}
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="deleteTask(${t.id})">Delete</button>
+      </div>
+    </div>`).join('');
+
+  const doneSection = done.length ? `
+    <div class="collapsible-header" onclick="state.completedOpen=!state.completedOpen;render()">
+      <span>Completed (${done.length})</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="${state.completedOpen?'18 15 12 9 6 15':'6 9 12 15 18 9'}"/></svg>
+    </div>
+    ${state.completedOpen ? done.map(t=>`
+      <div class="card task-card task-${t.priority} task-done" style="opacity:0.65;border-left-width:3px;border-radius:var(--border-radius-lg)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="checkbox" class="checkbox" checked onchange="toggleTask(${t.id})">
+          <span class="task-title" style="font-size:14px;flex:1">${esc(t.title)}</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteTask(${t.id})">Delete</button>
+        </div>
+      </div>`).join('') : ''}` : '';
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2 class="section-title" style="margin:0">To-Do</h2>
+      <button class="btn btn-primary btn-sm" onclick="state.showAddTask=true;render()">+ Add task</button>
+    </div>
+    ${addForm}
+    ${active.length===0 && !state.showAddTask ? '<div class="empty">No active tasks — add one above</div>' : taskCards}
+    ${doneSection}`;
+}
+
+function renderNotes(){
+  if(state.editNote){
+    return `
+      <button class="back-btn" onclick="saveNote()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to notes
+      </button>
+      <div class="form-group"><label>Title</label><input id="en-title" value="${esc(form.editNoteTitle)}"></div>
+      <div class="form-group"><label>Body</label><textarea id="en-body" style="min-height:260px">${esc(form.editNoteBody)}</textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="saveNote()">Save</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteNote(${state.editNote.id})">Delete note</button>
+      </div>`;
+  }
+
+  const addForm = state.showAddNote ? `
+    <div class="card" style="margin-bottom:1rem">
+      <div class="form-group"><label>Title *</label><input id="n-title" placeholder="Note title" value="${esc(form.noteTitle)}"></div>
+      <div class="form-group"><label>Body</label><textarea id="n-body" placeholder="Write something...">${esc(form.noteBody)}</textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addNote()">Save note</button>
+        <button class="btn" onclick="state.showAddNote=false;render()">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const noteCards = state.notes.map(n=>`
+    <div class="note-preview" onclick="openNote(${n.id})">
+      <div class="card" style="cursor:pointer">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:14px;font-weight:500">${esc(n.title)}</span>
+          <span style="font-size:11px;color:var(--color-text-tertiary)">${formatDate(n.createdAt)}</span>
+        </div>
+        ${n.body ? `<p class="note-body-preview">${esc(n.body)}</p>` : ''}
+      </div>
+    </div>`).join('');
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2 class="section-title" style="margin:0">Notes</h2>
+      <button class="btn btn-primary btn-sm" onclick="state.showAddNote=true;render()">+ New note</button>
+    </div>
+    ${addForm}
+    ${state.notes.length===0 && !state.showAddNote ? '<div class="empty">No notes yet — create one above</div>' : noteCards}`;
+}
+
+function renderHabits(){
+  const addForm = state.showAddHabit ? `
+    <div class="card" style="margin-bottom:1rem">
+      <div class="form-group"><label>Habit name *</label><input id="h-name" placeholder="e.g. Exercise, Read 30 mins" value="${esc(form.habitName)}"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addHabit()">Add habit</button>
+        <button class="btn" onclick="state.showAddHabit=false;render()">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const doneToday = state.habits.filter(h=>h.doneToday).length;
+  const summary = state.habits.length ? `
+    <div style="display:flex;gap:10px;margin-bottom:1rem">
+      <div style="flex:1;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:500">${doneToday}/${state.habits.length}</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Done today</div>
+      </div>
+      <div style="flex:1;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
+        <div style="font-size:22px;font-weight:500">${Math.max(...state.habits.map(h=>h.streak),0)}</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Best streak</div>
+      </div>
+    </div>` : '';
+
+  const habitRows = state.habits.length ? `
+    <div class="card">
+      ${state.habits.map(h=>`
+        <div class="habit-row">
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="checkbox" class="checkbox" ${h.doneToday?'checked':''} onchange="toggleHabit(${h.id})">
+            <span style="font-size:14px;${h.doneToday?'color:var(--color-text-tertiary);text-decoration:line-through':''}">${esc(h.name)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${h.streak > 0 ? `<span class="streak-badge">🔥 ${h.streak}d</span>` : ''}
+            <button class="btn btn-sm btn-danger" onclick="deleteHabit(${h.id})">Delete</button>
+          </div>
+        </div>`).join('')}
+    </div>` : '<div class="empty">No habits yet — add one to start tracking</div>';
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2 class="section-title" style="margin:0">Habits</h2>
+      <button class="btn btn-primary btn-sm" onclick="state.showAddHabit=true;render()">+ Add habit</button>
+    </div>
+    ${addForm}
+    ${summary}
+    ${habitRows}`;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function bindEvents(){
+  const bind = (id, key) => { const el = document.getElementById(id); if(el) el.addEventListener('input', e => { form[key]=e.target.value; }); };
+  bind('f-title','taskTitle'); bind('f-desc','taskDesc'); bind('f-due','taskDue');
+  bind('n-title','noteTitle'); bind('n-body','noteBody');
+  bind('h-name','habitName');
+  bind('en-title','editNoteTitle'); bind('en-body','editNoteBody');
+  const ps = document.getElementById('f-prio');
+  if(ps) ps.addEventListener('change', e => form.taskPriority=e.target.value);
+}
+
+loadData();
+</script>
+</body>
+</html>
